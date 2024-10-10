@@ -25,7 +25,6 @@
         let currentFileIndex = 0;
         let files = [];
 
-        // フォルダ選択時の処理
         document.getElementById('select-folder').addEventListener('click', async () => {
             const result = await ipcRenderer.invoke('select-folder');
             const folderPath = result.folderPath;
@@ -43,11 +42,10 @@
                     li.addEventListener('click', async () => {
                         const fileExtension = path.extname(file).toLowerCase();
                         if (['.mp3', '.wav', '.ogg'].includes(fileExtension)) {
-                            currentFileIndex = index; // 選択されたファイルのインデックスを保存
+                            currentFileIndex = index;
                             const filePath = path.join(folderPath, file);
-                            playAudio(filePath); // 音声を再生
+                            playAudio(filePath);
 
-                            // 再生開始時にメタデータ取得と書き込み
                             const metadataResult = await ipcRenderer.invoke('write-metadata', filePath);
                             if (metadataResult.success) {
                                 console.log(`Title: ${metadataResult.title}, Artist: ${metadataResult.artist}`);
@@ -65,13 +63,11 @@
             }
         });
 
-        // 音声ファイルを再生する関数
         function playAudio(filePath) {
             audioPlayer.src = filePath;
             audioPlayer.play();
         }
 
-        // 再生終了時に次の動作を選択する
         audioPlayer.addEventListener('ended', () => {
             const playbackOption = document.querySelector('input[name="playback-option"]:checked').value;
             if (playbackOption === 'next') {
@@ -81,7 +77,6 @@
             }
         });
 
-        // 次の音声ファイルを再生する関数
         function playNextAudio() {
             if (currentFileIndex + 1 < files.length) {
                 currentFileIndex++;

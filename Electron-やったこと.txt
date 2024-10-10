@@ -1,7 +1,10 @@
-・node.jsインストールサイトからnode.jsをインストールして．
+・node.jsインストールサイトからnode.jsをインストール
 https://nodejs.org/en
 
 ・PowerShellで，BGM-OBS_Display-mainディレクトリに移動する．
+
+・package.jsonファイル生成
+npm init
 
 ・node_modulesフォルダをその階層に生成
 npm install
@@ -14,6 +17,3 @@ npm install node-id3
 npm install music-metadata
 ・music-metadataを最新バージョンにアップデート
 npm install music-metadata@latest
-
-・発動
-BGM-OBS_Display-mainディレクトリでnpm startをpowershellから打って発動させて．
