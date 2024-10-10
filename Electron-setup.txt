@@ -1,14 +1,19 @@
-node.jsインストールサイト
+・node.jsインストールサイトからnode.jsをインストール
 https://nodejs.org/en
 
-package.jsonファイル生成
+・PowerShellで，BGM-OBS_Display-mainディレクトリに移動する．
+
+・package.jsonファイル生成
 npm init
 
-Electronのインストール
+・node_modulesフォルダをその階層に生成
+npm install
+
+・Electronのインストール
 npm install --save-dev electron
 
-
+・音楽ファイルデータ抽出ライブラリやファイル読み込みライブラリのインストール
 npm install node-id3
 npm install music-metadata
-music-metadataを最新バージョンにアップデート
+・music-metadataを最新バージョンにアップデート
 npm install music-metadata@latest
