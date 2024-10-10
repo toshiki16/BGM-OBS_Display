@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBS Display Content</title>
+    <style>
+        body {
+            color: white;
+            background-color: black;
+            font-size: 3em;
+            text-align: left;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div id="content">Waiting for content...</div>
+
+    <script>
+        async function fetchContent() {
+            try {
+                // CSVファイルゲット
+                const response = await fetch('bgm.csv');
+                const text = await response.text();
+
+                // CSVをカンマで区切り，各行を配列に変換
+                const rows = text.split('\n').map(row => row.split(','));
+
+                // 各行の要素を改行でつないで表示用に変換
+                const contentText = rows.map(row => row.join('<br>')).join('<br><br>');  // カンマで分割し改行
+
+                // contentIDの要素に表示
+                document.getElementById('content').innerHTML = contentText || "No content available";
+            } catch (error) {
+                console.error('Error fetching content:', error);
+                document.getElementById('content').innerText = "Error loading content";
+            }
+        }
+
+        // 5秒ごとにファイルをチェック
+        setInterval(fetchContent, 5000);
+
+        // 初回読み込み
+        fetchContent();
+    </script>
+</body>
+</html>

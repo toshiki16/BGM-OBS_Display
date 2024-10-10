@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Viewer</title>
+</head>
+<body>
+    <h1>フォルダ内のファイルを表示</h1>
+    <button id="select-folder">フォルダを選択</button>
+    <!-- <h2>選択されたフォルダ: <span id="folder-path">未選択</span></h2> -->
+    <ul id="file-list"></ul>
+
+    <h2>音声ファイルの再生</h2>
+    <audio id="audio-player" controls></audio>
+
+    <h3>再生終了時の動作:</h3>
+    <label><input type="radio" name="playback-option" value="next" checked> 次の音声を再生</label><br>
+    <label><input type="radio" name="playback-option" value="repeat"> 同じ音声を繰り返し再生</label>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        const path = require('path');
+        const audioPlayer = document.getElementById('audio-player');
+        let currentFileIndex = 0;
+        let files = [];
+
+        // フォルダ選択時の処理
+        document.getElementById('select-folder').addEventListener('click', async () => {
+            const result = await ipcRenderer.invoke('select-folder');
+            const folderPath = result.folderPath;
+            files = result.files;
+
+            if (folderPath) {
+                // document.getElementById('folder-path').textContent = folderPath;
+                const fileList = document.getElementById('file-list');
+                fileList.innerHTML = ''; // 既存のリストをクリア
+
+                files.forEach((file, index) => {
+                    const li = document.createElement('li');
+                    li.textContent = file;
+                    li.style.cursor = 'pointer';
+                    li.addEventListener('click', async () => {
+                        const fileExtension = path.extname(file).toLowerCase();
+                        if (['.mp3', '.wav', '.ogg'].includes(fileExtension)) {
+                            currentFileIndex = index; // 選択されたファイルのインデックスを保存
+                            const filePath = path.join(folderPath, file);
+                            playAudio(filePath); // 音声を再生
+
+                            // 再生開始時にメタデータ取得と書き込み
+                            const metadataResult = await ipcRenderer.invoke('write-metadata', filePath);
+                            if (metadataResult.success) {
+                                console.log(`Title: ${metadataResult.title}, Artist: ${metadataResult.artist}`);
+                            } else {
+                                console.error('メタデータ取得エラー:', metadataResult.error);
+                            }
+                        } else {
+                            alert('このファイルは音声ファイルではありません');
+                        }
+                    });
+                    fileList.appendChild(li);
+                });
+            } else {
+                alert('フォルダが選択されていません');
+            }
+        });
+
+        // 音声ファイルを再生する関数
+        function playAudio(filePath) {
+            audioPlayer.src = filePath;
+            audioPlayer.play();
+        }
+
+        // 再生終了時に次の動作を選択する
+        audioPlayer.addEventListener('ended', () => {
+            const playbackOption = document.querySelector('input[name="playback-option"]:checked').value;
+            if (playbackOption === 'next') {
+                playNextAudio();
+            } else if (playbackOption === 'repeat') {
+                audioPlayer.play();
+            }
+        });
+
+        // 次の音声ファイルを再生する関数
+        function playNextAudio() {
+            if (currentFileIndex + 1 < files.length) {
+                currentFileIndex++;
+                const folderPath = document.getElementById('folder-path').textContent;
+                const filePath = path.join(folderPath, files[currentFileIndex]);
+                playAudio(filePath);
+            } else {
+                alert('これ以上再生できる音声ファイルがありません');
+            }
+        }
+    </script>
+</body>
+</html>

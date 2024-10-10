@@ -1,0 +1,14 @@
+node.jsインストールサイト
+https://nodejs.org/en
+
+package.jsonファイル生成
+npm init
+
+Electronのインストール
+npm install --save-dev electron
+
+
+npm install node-id3
+npm install music-metadata
+music-metadataを最新バージョンにアップデート
+npm install music-metadata@latest
